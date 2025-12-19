@@ -59,7 +59,9 @@ const ParentTraining = () => {
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-blue-950 mb-4">Conclusion</h2>
             <p className="text-gray-700 font-nunito text-lg leading-relaxed">
-              Parent training plays a crucial role in enhancing the development of children while promoting a positive family dynamic. It helps parents navigate the challenges of raising children in a supportive and effective way.
+              Parent training plays a crucial role in enhancing the development of children while
+              promoting a positive family dynamic. It helps parents navigate the challenges of
+              raising children in a supportive and effective way.
             </p>
           </div>
 
