@@ -213,7 +213,7 @@ export default function AdminServices() {
                   <div key={index} className="">
                     <h4 className="font-semibold text-lg text-blue-900">{section.header}</h4>
                     {section.description && (
-                      <p className="mt-1 whitespace-pre-wrap break-words">{section.description}</p>
+                      <p className="mt-1 whitespace-pre-wrap wrap-break-words">{section.description}</p>
                     )}
                     {section.hasList && section.listItems && section.listItems.length > 0 && (
                       <ul className="list-disc pl-6 mt-2">

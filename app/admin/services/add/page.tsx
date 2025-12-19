@@ -333,7 +333,7 @@ export default function AddService() {
                   
                   {section.listItems.map((item, itemIndex) => (
                     <div key={`${sectionIndex}-${itemIndex}`} className="flex gap-3 mb-3 items-center">
-                      <div className="flex-grow">
+                      <div className="grow">
                         <input
                           type="text"
                           value={item}

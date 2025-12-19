@@ -121,7 +121,7 @@ export default function ServicesPage() {
     return (
       <main className="bg-gray-50 min-h-screen">
         <Navbar />
-        <section className="relative bg-gradient-to-b from-[#3f1a7b] to-[#3f1a7b] py-48 text-center">
+        <section className="relative bg-linear-to-b from-[#3f1a7b] to-[#3f1a7b] py-48 text-center">
           <div className="max-w-4xl mx-auto px-6">
             <h1 className="text-5xl md:text-6xl font-hand font-bold text-white mb-4">
               Our Services
@@ -141,7 +141,7 @@ export default function ServicesPage() {
     return (
       <main className="bg-gray-50 min-h-screen">
         <Navbar />
-        <section className="relative bg-gradient-to-b from-[#3f1a7b] to-[#3f1a7b] py-48 text-center">
+        <section className="relative bg-linear-to-b from-[#3f1a7b] to-[#3f1a7b] py-48 text-center">
           <div className="max-w-4xl mx-auto px-6">
             <h1 className="text-5xl md:text-6xl font-hand font-bold text-white mb-4">
               Our Services
@@ -169,7 +169,7 @@ export default function ServicesPage() {
       <Navbar />
       
       {/* HERO */}
-      <section className="relative bg-gradient-to-b from-[#3f1a7b] to-[#3f1a7b] py-48 text-center">
+      <section className="relative bg-linear-to-b from-[#3f1a7b] to-[#3f1a7b] py-48 text-center">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-5xl md:text-6xl font-hand font-bold text-white mb-4">
             Our Services
