@@ -1,16 +1,60 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const [email, setEmail] = useState("Loading..."); // fallback until fetch completes
+
+  useEffect(() => {
+    const token = localStorage.getItem("adminToken");
+
+    if (!token) {
+      router.replace("/admin/login");
+      return;
+    }
+
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/auth/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch user");
+        }
+
+        const userData = await res.json();
+        setEmail(userData.email || "admin@arcl.org");
+      } catch (err) {
+        console.error("Auth error:", err);
+        localStorage.removeItem("adminToken");
+        router.replace("/admin/login");
+      }
+    };
+
+    // Optional: check token expiration before fetching
+    try {
+      const payloadBase64 = token.split(".")[1];
+      const decoded = JSON.parse(atob(payloadBase64));
+      if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+        localStorage.removeItem("adminToken");
+        router.replace("/login");
+      } else {
+        fetchUser();
+      }
+    } catch (err) {
+      console.error("Invalid token", err);
+      localStorage.removeItem("adminToken");
+      router.replace("/login");
+    }
+  }, [router]);
+
   return (
     <div className="flex h-screen bg-gray-100 text-gray-800 overflow-hidden">
 
@@ -25,9 +69,7 @@ export default function AdminLayout({
           <h2 className="text-lg font-semibold">Admin Panel</h2>
 
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500 hidden sm:block">
-              admin@arcl.org
-            </span>
+            <span className="text-sm text-gray-500 hidden sm:block">{email}</span>
             <div className="w-9 h-9 rounded-full bg-[#3f1a7b] text-white flex items-center justify-center">
               <User size={18} />
             </div>
@@ -35,9 +77,7 @@ export default function AdminLayout({
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-6 lg:p-10">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto p-6 lg:p-10">{children}</main>
       </div>
     </div>
   );

@@ -247,10 +247,11 @@ export default function AdminGalleryPage() {
               </p>
               <button
                 onClick={() => handleDelete(img._id)}
-                className="bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition"
-              >
+                className="bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
+                aria-label="Delete Image"
+                >
                 <Trash2 size={18} />
-              </button>
+                </button>
             </div>
           </div>
         ))}

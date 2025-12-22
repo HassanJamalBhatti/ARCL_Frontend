@@ -15,7 +15,7 @@ const trirong = Trirong({
 const menuItems = [
   { title: "Home", href: "/" },
   {
-    title: "AboutUS",
+    title: "About Us",
     href: "/AboutUs",
     submenu: [
       { title: "Services", href: "/services" },

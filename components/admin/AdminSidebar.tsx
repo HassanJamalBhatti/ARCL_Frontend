@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Brain,
@@ -12,14 +12,44 @@ import {
   LogOut,
   User,
   ShieldCheck,
-  LogIn,
   ArrowLeft,
   Info,
   Camera,
+  Megaphone,
 } from "lucide-react";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Check authentication
+  useEffect(() => {
+    const token = localStorage.getItem("adminToken");
+    if (!token) {
+      router.replace("/admin/login");
+    }
+  }, [router]);
+
+  // Logout function
+  const handleLogout = async () => {
+    const sessionId = localStorage.getItem("sessionId");
+    try {
+      if (sessionId) {
+        await fetch("http://localhost:5000/api/auth/logout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId }),
+        });
+      }
+    } catch (err) {
+      console.error("Logout failed", err);
+    } finally {
+      localStorage.removeItem("adminToken");
+      localStorage.removeItem("userInfo");
+      localStorage.removeItem("sessionId");
+      router.replace("/login");
+    }
+  };
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-gradient-to-b from-[#3f1a7b] to-[#2b1257] text-white flex flex-col shadow-xl">
@@ -87,6 +117,22 @@ export default function AdminSidebar() {
         >
           Gallery
         </NavItem>
+
+        <NavItem
+          href="/admin/newsletters"
+          icon={<Megaphone size={18} />}
+          active={pathname.startsWith("/admin/newsletters")}
+        >
+          Newsletters
+        </NavItem>
+
+        <NavItem
+          href="/admin/users"
+          icon={<User size={18} />}
+          active={pathname.startsWith("/admin/users")}
+        >
+          Users
+        </NavItem>
       </nav>
 
       {/* Bottom Section */}
@@ -98,14 +144,10 @@ export default function AdminSidebar() {
           <ArrowLeft size={16} /> Back to Website
         </Link>
 
-        <Link
-          href="/admin/login"
-          className="flex items-center gap-2 p-3 rounded-lg bg-white/10 hover:bg-white/20 transition"
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-2 p-3 rounded-lg text-red-300 hover:bg-red-500/20 transition"
         >
-          <LogIn size={16} /> Login
-        </Link>
-
-        <button className="flex w-full items-center gap-2 p-3 rounded-lg text-red-300 hover:bg-red-500/20 transition">
           <LogOut size={16} /> Logout
         </button>
       </div>
@@ -113,7 +155,7 @@ export default function AdminSidebar() {
   );
 }
 
-/* Nav Item */
+/* Nav Item Component */
 function NavItem({
   href,
   icon,

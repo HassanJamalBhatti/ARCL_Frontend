@@ -18,7 +18,7 @@ import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: {
-    default: "Autism Care & Therapy Center | Professional Support",
+    default: "ARCL",
     template: "%s | Autism Care Center",
   },
   description:

@@ -99,14 +99,21 @@ export default function AdminPage() {
       />
       <h3 className="font-bold">{m.name}</h3>
       <p className="text-gray-500">{m.position}</p>
-      <div className="flex justify-center gap-4 mt-4">
-        <Link href={`/admin/about/${type}/edit/${m._id}`} className="text-blue-600 hover:text-blue-800">
-          <FaEdit />
+      <div className="flex justify-center gap-3 mt-4">
+        <Link
+            href={`/admin/about/${type}/edit/${m._id}`}
+            className="flex items-center gap-1 text-sm px-3 py-1 border rounded text-blue-600 hover:bg-blue-100 hover:text-blue-800 transition"
+        >
+            <FaEdit size={14} /> Edit
         </Link>
-        <button onClick={() => deleteMember(type, m._id)} className="text-red-600 hover:text-red-800">
-          <FaTrash />
+
+        <button
+            onClick={() => deleteMember(type, m._id)}
+            className="flex items-center gap-1 text-sm px-3 py-1 border border-red-400 text-red-600 rounded hover:bg-red-100 hover:text-red-800 transition"
+        >
+            <FaTrash size={14} /> Delete
         </button>
-      </div>
+        </div>
     </div>
   );
 
@@ -163,10 +170,22 @@ export default function AdminPage() {
               <a href={`http://localhost:5000${c.pdf}`} target="_blank" className="flex justify-center items-center gap-2 text-red-600 mt-2">
                 <FaFilePdf /> PDF
               </a>
-              <div className="flex justify-center gap-4 mt-3">
-                <Link href={`/admin/about/certifications/edit/${c._id}`} className="text-blue-600 hover:text-blue-800"><FaEdit /></Link>
-                <button onClick={() => deleteCertification(c._id)} className="text-red-600 hover:text-red-800"><FaTrash /></button>
-              </div>
+              <div className="flex justify-center gap-3 mt-3">
+                <Link
+                    href={`/admin/about/certifications/edit/${c._id}`}
+                    className="flex items-center gap-1 text-sm px-3 py-1 border rounded text-blue-600 hover:bg-blue-100 hover:text-blue-800 transition"
+                >
+                    <FaEdit size={14} /> Edit
+                </Link>
+
+                <button
+                    onClick={() => deleteCertification(c._id)}
+                    className="flex items-center gap-1 text-sm px-3 py-1 border border-red-400 text-red-600 rounded hover:bg-red-100 hover:text-red-800 transition"
+                >
+                    <FaTrash size={14} /> Delete
+                </button>
+                </div>
+
             </div>
           ))}
         </div>
@@ -184,12 +203,24 @@ export default function AdminPage() {
           {financialPDFs.map((f) => (
             <div key={f._id} className="bg-white p-4 rounded-xl shadow hover:shadow-lg text-center">
               <a href={`http://localhost:5000${f.pdf}`} target="_blank" className="flex justify-center items-center gap-2 text-red-600">
-                <FaFilePdf /> {f.title}
+                <FaFilePdf /> <span className="text-black">{f.title}</span>
               </a>
-              <div className="flex justify-center gap-4 mt-3">
-                <Link href={`/admin/about/financial/edit/${f._id}`} className="text-blue-600 hover:text-blue-800"><FaEdit /></Link>
-                <button onClick={() => deleteFinancialPDF(f._id)} className="text-red-600 hover:text-red-800"><FaTrash /></button>
-              </div>
+              <div className="flex justify-center gap-3 mt-3">
+                <Link
+                    href={`/admin/about/financial/edit/${f._id}`}
+                    className="flex items-center gap-1 text-sm px-3 py-1 border rounded text-blue-600 hover:bg-blue-100 hover:text-blue-800 transition"
+                >
+                    <FaEdit size={14} /> Edit
+                </Link>
+
+                <button
+                    onClick={() => deleteFinancialPDF(f._id)}
+                    className="flex items-center gap-1 text-sm px-3 py-1 border border-red-400 text-red-600 rounded hover:bg-red-100 hover:text-red-800 transition"
+                >
+                    <FaTrash size={14} /> Delete
+                </button>
+                </div>
+
             </div>
           ))}
         </div>

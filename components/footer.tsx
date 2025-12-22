@@ -1,6 +1,5 @@
 "use client";
 import Image from "next/image";
-import React from 'react';
 import { CirclePlus } from 'lucide-react';
 import { FaTwitter, FaFacebookF, FaYoutube } from "react-icons/fa";
 
