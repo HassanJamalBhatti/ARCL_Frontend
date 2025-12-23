@@ -87,7 +87,7 @@ export default function AdminNewsUpdatePage() {
 
         <button
           onClick={() => router.push("/admin/news/add")}
-          className="flex items-center gap-2 px-4 py-2 bg-pink-600 text-white rounded-full font-semibold hover:bg-pink-700"
+          className="flex items-center gap-2 bg-[#3f1a7b] text-white px-4 py-2 rounded-lg hover:bg-purple-800"
         >
           <Plus size={18} /> Add New
         </button>

@@ -10,6 +10,7 @@ import Navbar from "@/components/Navbar";
 interface Therapy {
   _id: string;
   mainTitle: string;
+  status: "Active" | "Inactive";
 }
 
 interface GalleryImage {
@@ -29,8 +30,10 @@ export default function GalleryPage() {
   const fetchTherapies = async () => {
     try {
       const res = await fetch("http://localhost:5000/api/therapies");
-      const data = await res.json();
-      setTherapies(data.filter((t: Therapy) => t.status === "Active"));
+      const data: Therapy[] = await res.json();
+
+      // Filter only Active therapies
+      setTherapies(data.filter((t) => t.status === "Active"));
     } catch (err) {
       console.error("Error fetching therapies:", err);
     }
@@ -39,7 +42,7 @@ export default function GalleryPage() {
   const fetchGallery = async () => {
     try {
       const res = await fetch("http://localhost:5000/api/gallery");
-      const data = await res.json();
+      const data: GalleryImage[] = await res.json();
       setGallery(data);
     } catch (err) {
       console.error("Error fetching gallery:", err);
@@ -87,7 +90,7 @@ export default function GalleryPage() {
           {/* All Category */}
           <button
             onClick={() => setActiveCategory("All")}
-            className={`px-6 py-3 rounded-full text-sm md:text-base font-semibold transition shadow
+            className={`px-6 py-3 rounded-full font-semibold transition shadow
               ${
                 activeCategory === "All"
                   ? "bg-[#3f1a7b] text-white"
@@ -102,7 +105,7 @@ export default function GalleryPage() {
             <button
               key={therapy._id}
               onClick={() => setActiveCategory(therapy._id)}
-              className={`px-6 py-3 rounded-full text-sm md:text-base font-semibold transition shadow
+              className={`px-6 py-3 rounded-full font-semibold transition shadow
                 ${
                   activeCategory === therapy._id
                     ? "bg-[#3f1a7b] text-white"
@@ -115,7 +118,10 @@ export default function GalleryPage() {
         </div>
 
         {/* GALLERY GRID */}
-        <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        <motion.div
+          layout
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8"
+        >
           <AnimatePresence>
             {filteredImages.map((img) => (
               <motion.div
@@ -139,13 +145,16 @@ export default function GalleryPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#3f1a7b]/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
                 <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <p className="text-white font-semibold text-sm">{img.therapyTitle}</p>
+                  <p className="text-white font-semibold text-sm">
+                    {img.therapyTitle}
+                  </p>
                 </div>
               </motion.div>
             ))}
           </AnimatePresence>
         </motion.div>
       </section>
+
       <Footer />
     </div>
   );

@@ -48,11 +48,8 @@ export default function DonatePage() {
       <Navbar />
 
       {/* Hero */}
-<<<<<<< HEAD
-      <section className="relative bg-gradient-to-b h-[60vh] from-[#3f1a7b] to-[#3f1a7b] py-32 text-center">
-=======
-      <section className="relative bg-linear-to-b h-[75vh] from-[#3f1a7b] to-[#3f1a7b] py-48 text-center">
->>>>>>> 98810ec14407136bd34777cdd5da529ef1565129
+     <section className="relative bg-linear-to-b h-[75vh] from-[#3f1a7b] to-[#3f1a7b] py-48 text-center">
+
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-5xl md:text-6xl font-hand font-bold text-white mb-4">
             Donate Now
@@ -100,13 +97,6 @@ export default function DonatePage() {
           <p className="text-gray-700 mb-6 text-center">
             Complete the form below, and we’ll get in touch with you soon.
           </p>
-
-          {success && (
-            <p className="text-green-600 mb-4 text-center font-semibold">
-              Thank you! We received your donation request.
-            </p>
-          )}
-
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label className="block mb-2 font-semibold text-gray-700">
@@ -183,6 +173,11 @@ export default function DonatePage() {
             >
               Submit
             </button>
+            {success && (
+            <p className="text-green-600 mb-4 text-center font-semibold">
+              Thank you! We received your donation request.
+            </p>
+          )}
           </form>
         </div>
       </section>
