@@ -1,4 +1,3 @@
-// pages/admin/therapies/index.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -27,7 +26,6 @@ export default function AdminTherapies() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch therapies from backend
   const fetchTherapies = async () => {
     setLoading(true);
     setError(null);
@@ -48,7 +46,6 @@ export default function AdminTherapies() {
     fetchTherapies();
   }, []);
 
-  // Delete therapy
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this therapy?")) return;
     try {
@@ -67,10 +64,9 @@ export default function AdminTherapies() {
   if (therapies.length === 0) return <p className="text-center py-10">No therapies found.</p>;
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto py-12 px-4">
-
+    <div className="max-w-7xl mx-auto py-12 px-4">
       {/* Top Bar */}
-      <div className=" top-0 bg-white z-50 flex justify-between items-center px-6 py-4 shadow-md border-b border-gray-200">
+      <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-blue-950">Therapies</h1>
         <Link
           href="/admin/therapiesdetail/add"
@@ -80,69 +76,53 @@ export default function AdminTherapies() {
         </Link>
       </div>
 
-      {/* Therapy Cards */}
-      <div className="space-y-6">
-        {therapies.map((therapy) => (
-          <div key={therapy._id} className="bg-white rounded-xl p-6 shadow w-full">
-
-            {/* Header & Status */}
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center">
-              <h3 className="text-2xl font-bold text-blue-950">{therapy.mainTitle}</h3>
-              <div className="flex gap-2 mt-2 md:mt-0">
-                <span
-                  className={`px-2 py-1 rounded text-white text-sm ${
-                    therapy.status === "Active" ? "bg-green-600" : "bg-red-600"
-                  }`}
-                >
-                  {therapy.status}
-                </span>
-                <span className="px-2 py-1 rounded bg-gray-200 text-gray-800 text-sm">{therapy.role}</span>
-              </div>
-            </div>
-
-            {/* URL */}
-            {therapy.url && (
-              <p className="text-blue-600  mt-2">
-                URL:
-                {/* <a href={therapy.url} target="_blank" rel="noopener noreferrer"> */}
-                  {therapy.url}
-                {/* </a> */}
-              </p>
-            )}
-
-            {/* Sections */}
-            {therapy.sections.map((s, sectionIdx) => (
-              <div key={s.id || sectionIdx} className="text-gray-700 space-y-1 mt-4">
-                <h4 className="font-semibold text-lg">{s.header}</h4>
-                <p>{s.description}</p>
-                {s.hasList && (
-                  <ul className="list-disc pl-6">
-                    {s.listItems.map((li, idx) => (
-                      <li key={`${sectionIdx}-${idx}`}>{li}</li> // unique key per section & item
-                    ))}
-                  </ul>
-                )}
-              </div>
+      {/* Table */}
+      <div className="overflow-x-auto bg-white rounded-xl shadow">
+        <table className="w-full text-left border-collapse">
+          <thead className="bg-[#3f1a7b] text-white">
+            <tr>
+              <th className="p-4">Title</th>
+              <th className="p-4">Status</th>
+              <th className="p-4">Role</th>
+              {/* <th className="p-4">URL</th> */}
+              <th className="p-4 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {therapies.map((therapy) => (
+              <tr key={therapy._id} className="border-b hover:bg-gray-50">
+                <td className="p-4 font-semibold">{therapy.mainTitle}</td>
+                <td className="p-4">
+                  <span
+                    className={`px-2 py-1 rounded text-white text-sm ${
+                      therapy.status === "Active" ? "bg-green-600" : "bg-red-600"
+                    }`}
+                  >
+                    {therapy.status}
+                  </span>
+                </td>
+                <td className="p-4">{therapy.role}</td>
+                {/* <td className="p-4 text-blue-600">{therapy.url || "-"}</td> */}
+                <td className="p-4 text-center">
+                  <div className="flex justify-center gap-4">
+                    <Link
+                      href={`/admin/therapiesdetail/edit/${therapy._id}`}
+                      className="flex items-center gap-1 text-sm px-3 py-1 border rounded hover:bg-gray-50"
+                    >
+                      <FaEdit /> Edit
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(therapy._id)}
+                      className="flex items-center gap-1 text-sm px-3 py-1 border border-red-400 text-red-600 rounded hover:bg-red-50"
+                    >
+                      <FaTrash /> Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
             ))}
-            {/* Buttons */}
-            <div className="flex justify-end gap-4 mt-6">
-              <Link
-                href={`/admin/therapiesdetail/edit/${therapy._id}`}
-                className="flex items-center gap-1 text-blue-600 hover:underline"
-              >
-                <FaEdit /> Edit
-              </Link>
-
-              <button
-                onClick={() => handleDelete(therapy._id)}
-                className="flex items-center gap-1 text-red-600 hover:underline"
-              >
-                <FaTrash /> Delete
-              </button>
-            </div>
-
-          </div>
-        ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
