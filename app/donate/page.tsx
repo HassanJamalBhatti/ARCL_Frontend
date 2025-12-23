@@ -43,7 +43,7 @@ export default function DonatePage() {
     <main className="bg-white min-h-screen text-gray-900">
         <Navbar />
       {/* Hero */}
-      <section className="relative bg-gradient-to-b h-[75vh] from-[#3f1a7b] to-[#3f1a7b] py-48 text-center">
+      <section className="relative bg-linear-to-b h-[75vh] from-[#3f1a7b] to-[#3f1a7b] py-48 text-center">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-5xl md:text-6xl font-hand font-bold text-white mb-4">
             Donate Now
