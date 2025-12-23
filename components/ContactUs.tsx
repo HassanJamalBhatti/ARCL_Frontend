@@ -4,6 +4,8 @@
 import { useState } from "react";
 
 export default function ContactUs() {
+  const [loading, setLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -17,12 +19,42 @@ export default function ContactUs() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form Data:", form);
-    alert("Message sent successfully!");
-    setForm({ name: "", email: "", phone: "", message: "" });
-  };
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   console.log("Form Data:", form);
+  //   alert("Message sent successfully!");
+  //   setForm({ name: "", email: "", phone: "", message: "" });
+  // };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+  setStatusMessage("");
+
+  try {
+    const response = await fetch("http://localhost:5000/api/contact/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(form),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      setStatusMessage(data.message || "Message sent successfully!");
+      setForm({ name: "", email: "", phone: "", message: "" });
+    } else {
+      setStatusMessage(data.message || "Failed to send message");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    setStatusMessage("Network error. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <section className="w-full bg-white py-16">
@@ -67,14 +99,17 @@ export default function ContactUs() {
               className="p-3 rounded bg-white text-[#3f1a7b] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white"
               required
             />
+
             <button
               type="submit"
-              className="bg-white text-[#3f1a7b] font-semibold py-3 rounded hover:bg-gray-100 transition"
+              disabled={loading}
+              className="bg-white text-[#3f1a7b] cursor-pointer font-semibold py-3 rounded hover:bg-gray-100 transition"
             >
-              Send Message
+              {loading ? "Sending..." : "Send Message"}
             </button>
           </form>
         </div>
+
 
         {/* Right Side - Map and Address */}
         <div className="lg:w-1/2 flex flex-col gap-4">
