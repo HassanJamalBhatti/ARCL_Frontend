@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Plus, Upload, Trash2 } from "lucide-react";
+import { Plus, Upload, Trash2, Filter } from "lucide-react";
 
 /* ================= TYPES ================= */
 
@@ -26,6 +26,9 @@ export default function AdminGalleryPage() {
   const [gallery, setGallery] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const [filterTherapy, setFilterTherapy] = useState("");
+  const [search, setSearch] = useState("");
+
   const [form, setForm] = useState<{
     files: File[];
     previews: string[];
@@ -36,14 +39,14 @@ export default function AdminGalleryPage() {
     therapyId: "",
   });
 
-  /* ================= FETCH THERAPIES ================= */
+  /* ================= FETCH ================= */
+
   const fetchTherapies = async () => {
     const res = await fetch("http://localhost:5000/api/therapies");
     const data = await res.json();
     setTherapies(data.filter((t: Therapy) => t.status === "Active"));
   };
 
-  /* ================= FETCH GALLERY ================= */
   const fetchGallery = async () => {
     const res = await fetch("http://localhost:5000/api/gallery");
     const data = await res.json();
@@ -55,11 +58,10 @@ export default function AdminGalleryPage() {
     fetchGallery();
   }, []);
 
-  /* ================= FILE CHANGE ================= */
+  /* ================= FILE ================= */
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-
     setForm({
       ...form,
       files,
@@ -67,55 +69,60 @@ export default function AdminGalleryPage() {
     });
   };
 
-  /* ================= SAVE MULTIPLE ================= */
+  /* ================= SAVE ================= */
+
   const handleSave = async () => {
-    if (form.files.length === 0 || !form.therapyId) {
-      return alert("Please select therapy and images");
+    if (!form.files.length || !form.therapyId) {
+      return alert("Select therapy & images");
     }
 
     const fd = new FormData();
-    form.files.forEach((file) => fd.append("images", file));
+    form.files.forEach((f) => fd.append("images", f));
     fd.append("therapyId", form.therapyId);
 
     setLoading(true);
-    try {
-      const res = await fetch("http://localhost:5000/api/gallery", {
-        method: "POST",
-        body: fd,
-      });
+    await fetch("http://localhost:5000/api/gallery", {
+      method: "POST",
+      body: fd,
+    });
 
-      if (!res.ok) throw new Error("Upload failed");
-
-      await fetchGallery();
-      setForm({ files: [], previews: [], therapyId: "" });
-      alert("Images uploaded successfully");
-    } catch (err) {
-      alert("Error uploading images");
-    } finally {
-      setLoading(false);
-    }
+    await fetchGallery();
+    setForm({ files: [], previews: [], therapyId: "" });
+    setLoading(false);
   };
 
   /* ================= DELETE ================= */
+
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this image?")) return;
+    if (!confirm("Delete image?")) return;
     await fetch(`http://localhost:5000/api/gallery/${id}`, {
       method: "DELETE",
     });
     fetchGallery();
   };
 
+  /* ================= FILTER ================= */
+
+  const filteredGallery = gallery.filter((g) => {
+    const therapyMatch = filterTherapy
+      ? g.therapyId === filterTherapy
+      : true;
+
+    const searchMatch = g.therapyTitle
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    return therapyMatch && searchMatch;
+  });
+
   return (
-    <main className="min-h-screen px-6 py-12">
-      <h1 className="text-4xl font-extrabold text-[#2a1d7a] mb-2">
+    <main className="px-6 py-12">
+      <h1 className="text-4xl font-bold text-[#2a1d7a] mb-6">
         Gallery Management
       </h1>
-      <p className="text-gray-600 mb-10">
-        Upload multiple images according to therapies
-      </p>
 
-      {/* ================= ADD FORM ================= */}
-      <div className="bg-white p-8 rounded-2xl shadow-xl mb-16 max-w-6xl">
+      {/* ================= UPLOAD ================= */}
+       <div className="bg-white p-8 rounded-2xl shadow-xl mb-16 max-w-6xl">
         <h2 className="text-2xl font-bold text-[#2a1d7a] mb-6 flex items-center gap-2">
           <Plus /> Add Gallery Images
         </h2>
@@ -224,37 +231,88 @@ export default function AdminGalleryPage() {
           </div>
         )}
       </div>
-
-      {/* ================= GALLERY LIST ================= */}
-      <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-        {gallery.map((img) => (
-          <div
-            key={img._id}
-            className="bg-white rounded-xl shadow-lg overflow-hidden group relative"
+      {/* ================= FILTER ================= */}
+      <div className="bg-white p-6 rounded-xl shadow mb-6 flex flex-col md:flex-row gap-4">
+        <div className="flex items-center gap-2">
+          <Filter size={18} />
+          <select
+            value={filterTherapy}
+            onChange={(e) => setFilterTherapy(e.target.value)}
+            className="border rounded-lg px-3 py-2"
           >
-            <Image
-              src={`http://localhost:5000${img.imageUrl}`}
-              alt={img.therapyTitle}
-              width={400}
-              height={300}
-              unoptimized
-              className="h-56 w-full object-cover"
-            />
+            <option value="">All Therapies</option>
+            {therapies.map((t) => (
+              <option key={t._id} value={t._id}>
+                {t.mainTitle}
+              </option>
+            ))}
+          </select>
+        </div>
 
-            <div className="p-4 flex justify-between items-center">
-              <p className="text-sm text-gray-600 truncate">
-                {img.therapyTitle}
-              </p>
-              <button
-                onClick={() => handleDelete(img._id)}
-                className="bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
-                aria-label="Delete Image"
+        <input
+          type="text"
+          placeholder="Search therapy..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border rounded-lg px-4 py-2 flex-1"
+        />
+      </div>
+
+      {/* ================= TABLE ================= */}
+      <div className="overflow-x-auto bg-white rounded-xl shadow">
+        <table className="w-full text-left">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-4">Image</th>
+              <th className="p-4">Therapy</th>
+              <th className="p-4 text-right">Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {filteredGallery.map((g) => (
+              <tr
+                key={g._id}
+                className="border-t hover:bg-gray-50"
+              >
+                <td className="p-4">
+                  <Image
+                    src={`http://localhost:5000${g.imageUrl}`}
+                    alt=""
+                    width={80}
+                    height={60}
+                    unoptimized
+                    className="rounded-lg object-cover"
+                  />
+                </td>
+                <td className="p-4 font-medium">
+                  {g.therapyTitle}
+                </td>
+                <td className="p-4 text-right">
+                  <button
+                    onClick={() => handleDelete(g._id)}
+                    className="flex items-center gap-1 text-sm px-3 py-1
+                        border border-red-400 text-red-600 rounded-md
+                        hover:bg-red-50 hover:border-red-500 transition"
+                  >
+                    <Trash2 size={14} /> Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+
+            {filteredGallery.length === 0 && (
+              <tr>
+                <td
+                  colSpan={3}
+                  className="p-6 text-center text-gray-500"
                 >
-                <Trash2 size={18} />
-                </button>
-            </div>
-          </div>
-        ))}
+                  No images found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </main>
   );

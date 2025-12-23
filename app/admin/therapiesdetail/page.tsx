@@ -111,28 +111,28 @@ export default function AdminTherapies() {
             )}
 
             {/* Sections */}
-            {therapy.sections.map((s) => (
-              <div key={s.id} className="text-gray-700 space-y-1 mt-4">
+            {therapy.sections.map((s, sectionIdx) => (
+              <div key={s.id || sectionIdx} className="text-gray-700 space-y-1 mt-4">
                 <h4 className="font-semibold text-lg">{s.header}</h4>
                 <p>{s.description}</p>
                 {s.hasList && (
                   <ul className="list-disc pl-6">
                     {s.listItems.map((li, idx) => (
-                      <li key={idx}>{li}</li>
+                      <li key={`${sectionIdx}-${idx}`}>{li}</li> // unique key per section & item
                     ))}
                   </ul>
                 )}
               </div>
             ))}
-
             {/* Buttons */}
             <div className="flex justify-end gap-4 mt-6">
               <Link
-                href={`/admin/therapiesdetail/add?id=${therapy._id}`}
+                href={`/admin/therapiesdetail/edit/${therapy._id}`}
                 className="flex items-center gap-1 text-blue-600 hover:underline"
               >
                 <FaEdit /> Edit
               </Link>
+
               <button
                 onClick={() => handleDelete(therapy._id)}
                 className="flex items-center gap-1 text-red-600 hover:underline"

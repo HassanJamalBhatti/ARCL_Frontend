@@ -1,18 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 
+// Updated list item type with unique ID
+interface ListItem {
+  id: string;
+  text: string;
+}
+
 interface Section {
-  id: number;
+  id: string;
   header: string;
   description: string;
   hasList: boolean;
-  listItems: string[];
+  listItems: ListItem[];
 }
 
 interface Therapy {
+  _id?: string;
   mainTitle: string;
   sections: Section[];
   status: "Active" | "Inactive";
@@ -20,67 +27,120 @@ interface Therapy {
   url: string;
 }
 
-export default function AddTherapy() {
+// Helper to generate unique section
+const generateSection = (): Section => ({
+  id: crypto.randomUUID(),
+  header: "",
+  description: "",
+  hasList: false,
+  listItems: [{ id: crypto.randomUUID(), text: "" }],
+});
+
+// Helper to generate unique list item
+const generateListItem = (): ListItem => ({ id: crypto.randomUUID(), text: "" });
+
+export default function EditTherapy() {
   const router = useRouter();
+  const params = useParams();
+  const { id } = params;
+
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<Therapy>({
     mainTitle: "",
-    sections: [{ id: Date.now(), header: "", description: "", hasList: false, listItems: [""] }],
+    sections: [generateSection()],
     status: "Active",
     role: "Admin",
     url: "",
   });
 
-  const handleSectionChange = (index: number, field: keyof Section, value: any) => {
-    const sections = [...form.sections];
-    sections[index] = { ...sections[index], [field]: value };
-    setForm({ ...form, sections });
-  };
+  // Fetch therapy data
+  useEffect(() => {
+    if (!id) return;
+    setLoading(true);
 
-  const handleListItemChange = (sectionIndex: number, itemIndex: number, value: string) => {
-    const sections = [...form.sections];
-    sections[sectionIndex].listItems[itemIndex] = value;
-    setForm({ ...form, sections });
-  };
+    fetch(`http://localhost:5000/api/therapies/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setForm({
+          mainTitle: data.mainTitle || "",
+          sections:
+            data.sections && data.sections.length > 0
+              ? data.sections.map((s: any) => ({
+                  ...s,
+                  id: s.id || crypto.randomUUID(),
+                  listItems:
+                    s.listItems && s.listItems.length > 0
+                      ? s.listItems.map((li: any) => ({ id: li.id || crypto.randomUUID(), text: li.text || li }))
+                      : [generateListItem()],
+                }))
+              : [generateSection()],
+          status: data.status || "Active",
+          role: data.role || "Admin",
+          url: data.url || "",
+        });
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
+  }, [id]);
 
-  const addSection = () => {
+  // Section handlers
+  const handleSectionChange = (sectionId: string, field: keyof Section, value: any) => {
     setForm({
       ...form,
-      sections: [...form.sections, { id: Date.now(), header: "", description: "", hasList: false, listItems: [""] }],
+      sections: form.sections.map((s) => (s.id === sectionId ? { ...s, [field]: value } : s)),
     });
   };
 
-  const addListItem = (sectionIndex: number) => {
-    const sections = [...form.sections];
-    sections[sectionIndex].listItems.push("");
-    setForm({ ...form, sections });
+  const handleListItemChange = (sectionId: string, itemId: string, value: string) => {
+    setForm({
+      ...form,
+      sections: form.sections.map((s) =>
+        s.id === sectionId
+          ? { ...s, listItems: s.listItems.map((li) => (li.id === itemId ? { ...li, text: value } : li)) }
+          : s
+      ),
+    });
   };
 
-  const removeSection = (index: number) => {
-    const sections = [...form.sections];
-    sections.splice(index, 1);
-    setForm({ ...form, sections });
+  const addSection = () => {
+    setForm({ ...form, sections: [...form.sections, generateSection()] });
   };
 
-  const removeListItem = (sectionIndex: number, itemIndex: number) => {
-    const sections = [...form.sections];
-    sections[sectionIndex].listItems.splice(itemIndex, 1);
-    setForm({ ...form, sections });
+  const removeSection = (sectionId: string) => {
+    setForm({ ...form, sections: form.sections.filter((s) => s.id !== sectionId) });
+  };
+
+  const addListItem = (sectionId: string) => {
+    setForm({
+      ...form,
+      sections: form.sections.map((s) =>
+        s.id === sectionId ? { ...s, listItems: [...s.listItems, generateListItem()] } : s
+      ),
+    });
+  };
+
+  const removeListItem = (sectionId: string, itemId: string) => {
+    setForm({
+      ...form,
+      sections: form.sections.map((s) =>
+        s.id === sectionId ? { ...s, listItems: s.listItems.filter((li) => li.id !== itemId) } : s
+      ),
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    if (!id) return;
 
+    setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/therapies", {
-        method: "POST",
+      const res = await fetch(`http://localhost:5000/api/therapies/${id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-
-      if (!res.ok) throw new Error("Failed to add therapy");
-      alert("Therapy added successfully");
+      if (!res.ok) throw new Error("Failed to update therapy");
+      alert("Therapy updated successfully");
       router.push("/admin/therapiesdetail");
     } catch (err: any) {
       alert(err.message || "Something went wrong");
@@ -90,9 +150,11 @@ export default function AddTherapy() {
     }
   };
 
+  if (loading) return <p className="text-center py-10">Loading therapy data...</p>;
+
   return (
     <div className="max-w-5xl mx-auto py-16 px-4">
-      <h1 className="text-3xl font-bold text-center mb-8">Add New Therapy</h1>
+      <h1 className="text-3xl font-bold text-center mb-8">Edit Therapy</h1>
       <form onSubmit={handleSubmit} className="bg-white p-6 shadow rounded-lg">
         {/* Main Title */}
         <div className="mb-4">
@@ -151,12 +213,12 @@ export default function AddTherapy() {
         </div>
 
         {/* Sections */}
-        {form.sections.map((section, idx) => (
+        {form.sections.map((section) => (
           <div key={section.id} className="border p-4 rounded mb-4 relative bg-gray-50">
             <button
               type="button"
               className="absolute top-2 right-2 text-red-600 font-bold"
-              onClick={() => removeSection(idx)}
+              onClick={() => removeSection(section.id)}
             >
               X
             </button>
@@ -166,7 +228,7 @@ export default function AddTherapy() {
               <input
                 type="text"
                 value={section.header}
-                onChange={(e) => handleSectionChange(idx, "header", e.target.value)}
+                onChange={(e) => handleSectionChange(section.id, "header", e.target.value)}
                 className="w-full border px-3 py-2 rounded"
                 required
               />
@@ -176,10 +238,10 @@ export default function AddTherapy() {
               <label className="block mb-1 font-medium">Description</label>
               <textarea
                 value={section.description}
-                onChange={(e) => handleSectionChange(idx, "description", e.target.value)}
+                onChange={(e) => handleSectionChange(section.id, "description", e.target.value)}
                 className="w-full border px-3 py-2 rounded"
                 rows={3}
-              ></textarea>
+              />
             </div>
 
             <div className="mb-2 flex items-center gap-2">
@@ -187,27 +249,35 @@ export default function AddTherapy() {
               <input
                 type="checkbox"
                 checked={section.hasList}
-                onChange={(e) => handleSectionChange(idx, "hasList", e.target.checked)}
+                onChange={(e) => handleSectionChange(section.id, "hasList", e.target.checked)}
               />
             </div>
 
             {section.hasList &&
-              section.listItems.map((item, itemIdx) => (
-                <div key={itemIdx} className="flex gap-2 mb-2 items-center">
+              section.listItems.map((item) => (
+                <div key={item.id} className="flex gap-2 mb-2 items-center">
                   <input
                     type="text"
-                    value={item}
-                    onChange={(e) => handleListItemChange(idx, itemIdx, e.target.value)}
+                    value={item.text}
+                    onChange={(e) => handleListItemChange(section.id, item.id, e.target.value)}
                     className="w-full border px-3 py-2 rounded"
                   />
-                  <button type="button" onClick={() => removeListItem(idx, itemIdx)} className="bg-red-600 text-white px-2 py-1 rounded">
+                  <button
+                    type="button"
+                    onClick={() => removeListItem(section.id, item.id)}
+                    className="bg-red-600 text-white px-2 py-1 rounded"
+                  >
                     X
                   </button>
                 </div>
               ))}
 
             {section.hasList && (
-              <button type="button" onClick={() => addListItem(idx)} className="bg-green-600 text-white px-3 py-1 rounded">
+              <button
+                type="button"
+                onClick={() => addListItem(section.id)}
+                className="bg-green-600 text-white px-3 py-1 rounded"
+              >
                 + Add List Item
               </button>
             )}
@@ -220,7 +290,7 @@ export default function AddTherapy() {
 
         <div className="flex gap-4">
           <button type="submit" className="bg-blue-800 text-white px-6 py-2 rounded-full">
-            Add Therapy
+            Update Therapy
           </button>
           <Link href="/admin/therapiesdetail" className="bg-gray-400 text-white px-6 py-2 rounded-full">
             Cancel

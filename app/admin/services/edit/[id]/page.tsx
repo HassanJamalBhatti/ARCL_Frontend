@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 /* ================= TYPES ================= */
@@ -21,10 +21,10 @@ interface Service {
   url: string;
 }
 
-export default function AddServicePage() {
+export default function EditServicePage() {
+  const { id } = useParams();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-
+  const [loading, setLoading] = useState(true);
   const [form, setForm] = useState<Service>({
     mainTitle: "",
     sections: [{ id: Date.now(), header: "", description: "", hasList: false, listItems: [""] }],
@@ -33,10 +33,33 @@ export default function AddServicePage() {
     url: "",
   });
 
+  /* ================= FETCH SERVICE ================= */
+  useEffect(() => {
+    if (!id) return;
+    setLoading(true);
+    fetch(`http://localhost:5000/api/services/${id}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch service");
+        return res.json();
+      })
+      .then((data) => {
+        setForm({
+          ...data,
+          sections: data.sections?.map((s: any, i: number) => ({
+            ...s,
+            id: s.id || Date.now() + i,
+            listItems: s.listItems?.length ? s.listItems : [""],
+          })) || [{ id: Date.now(), header: "", description: "", hasList: false, listItems: [""] }],
+        });
+      })
+      .catch((err) => alert(err.message || "Failed to load service"))
+      .finally(() => setLoading(false));
+  }, [id]);
+
   /* ================= HANDLERS ================= */
-  const handleSectionChange = (i: number, field: keyof Section, value: any) => {
+  const handleSectionChange = (index: number, field: keyof Section, value: any) => {
     const sections = [...form.sections];
-    sections[i] = { ...sections[i], [field]: value };
+    sections[index] = { ...sections[index], [field]: value };
     setForm({ ...form, sections });
   };
 
@@ -88,20 +111,23 @@ export default function AddServicePage() {
     e.preventDefault();
     if (!form.mainTitle.trim()) return alert("Main title is required");
     for (const section of form.sections) {
-      if (!section.header.trim()) return alert("All section headers are required");
+      if (!section.header.trim()) return alert("Section header is required for all sections");
     }
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/services", {
-        method: "POST",
+      const res = await fetch(`http://localhost:5000/api/services/${id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
 
-      if (!res.ok) throw new Error("Failed to add service");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to update service");
+      }
 
-      alert("Service added successfully");
+      alert("Service updated successfully");
       router.push("/admin/services");
     } catch (err: any) {
       alert(err.message || "Something went wrong");
@@ -110,28 +136,30 @@ export default function AddServicePage() {
     }
   };
 
+  if (loading && !form.mainTitle) return <p className="text-center py-20">Loading service data...</p>;
+
   /* ================= UI ================= */
   return (
     <div className="max-w-6xl mx-auto py-16 px-4">
-      <h1 className="text-4xl font-bold text-center mb-8">Add New Service</h1>
+      <h1 className="text-4xl font-bold text-center mb-8">Edit Service</h1>
 
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md">
         {/* Main Title */}
         <input
           type="text"
           placeholder="Main Title"
-          className="w-full border p-3 rounded mb-4"
           value={form.mainTitle}
           onChange={(e) => setForm({ ...form, mainTitle: e.target.value })}
+          className="w-full border p-3 rounded mb-4"
         />
 
         {/* URL */}
         <input
           type="text"
           placeholder="URL Slug"
-          className="w-full border p-3 rounded mb-4"
           value={form.url}
           onChange={(e) => setForm({ ...form, url: e.target.value })}
+          className="w-full border p-3 rounded mb-4"
         />
 
         {/* Role Selector */}
@@ -141,7 +169,7 @@ export default function AddServicePage() {
           className="w-full border p-3 rounded mb-4"
         >
           <option value="Admin">Admin</option>
-          <option value="Services">Services</option>
+          <option value="Services">Service Provider</option>
           <option value="Parent">Parent</option>
         </select>
 
@@ -214,33 +242,21 @@ export default function AddServicePage() {
                     onChange={(e) => handleListItemChange(i, idx, e.target.value)}
                     className="w-full border p-2 rounded"
                   />
-                  <button
-                    type="button"
-                    className="text-red-600"
-                    onClick={() => removeListItem(i, idx)}
-                  >
+                  <button type="button" onClick={() => removeListItem(i, idx)} className="text-red-600">
                     X
                   </button>
                 </div>
               ))}
 
             {section.hasList && (
-              <button
-                type="button"
-                onClick={() => addListItem(i)}
-                className="text-green-600 text-sm"
-              >
+              <button type="button" onClick={() => addListItem(i)} className="text-green-600 text-sm">
                 + Add List Item
               </button>
             )}
           </div>
         ))}
 
-        <button
-          type="button"
-          onClick={addSection}
-          className="text-purple-700 mb-6"
-        >
+        <button type="button" onClick={addSection} className="text-purple-700 mb-6">
           + Add Section
         </button>
 
@@ -250,7 +266,7 @@ export default function AddServicePage() {
             disabled={loading}
             className="bg-[#3f1a7b] text-white px-6 py-2 rounded"
           >
-            {loading ? "Saving..." : "Add Service"}
+            {loading ? "Saving..." : "Update Service"}
           </button>
 
           <Link href="/admin/services" className="px-6 py-2 bg-gray-300 rounded">

@@ -14,57 +14,54 @@ interface User {
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
+  const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
-  console.log("Logged-in user:", loggedInUser);
-  /* ================= FETCH LOGGED-IN USER ================= */
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
+
+  const isAdmin = loggedInUser?.role.toLowerCase() === "admin";
+  console.log("Logged-in user:", isAdmin);
+
+
+  /* ================= FETCH CURRENT USER ================= */
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-    if (!token) {
+    const fetchMe = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/auth/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) throw new Error("Not authenticated");
+
+        const data = await res.json();
+        setLoggedInUser(data);
+      } catch (err: any) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    if (token) fetchMe();
+    else {
       setError("Not authenticated");
       setLoading(false);
-      return;
     }
-
-    try {
-      const payloadBase64 = token.split(".")[1];
-      const decoded = JSON.parse(atob(payloadBase64));
-      setLoggedInUser({
-        _id: decoded.id,
-        name: decoded.name || "",
-        email: decoded.email || "",
-        role: decoded.role || "",
-        status: decoded.status || "",
-      });
-    } catch (err) {
-      console.error("Invalid token", err);
-      setError("Invalid token");
-    }
-  }, []);
+  }, [token]);
 
   /* ================= FETCH USERS ================= */
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const res = await fetch("http://localhost:5000/api/users", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error("Failed to fetch users");
-        }
 
-        if (loggedInUser?.role === "admin") {
-          setUsers(data); // admin sees all users
-        } else if (loggedInUser) {
-          // non-admin sees only their own data
-          const filtered = data.filter((u: User) => u.email === loggedInUser.email);
-          setUsers(filtered);
-        }
+        if (!res.ok) throw new Error("Failed to fetch users");
+
+        const data = await res.json();
+        setUsers(data); // admin → all, user → self (backend controlled)
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -73,29 +70,21 @@ export default function AdminUsersPage() {
     };
 
     if (loggedInUser) fetchUsers();
-  }, [loggedInUser]);
+  }, [loggedInUser, token]);
 
-  /* ================= DELETE USER ================= */
+  /* ================= DELETE USER (ADMIN ONLY) ================= */
   const handleDelete = async (id: string) => {
-    if (loggedInUser?.role !== "admin") {
-      alert("Only admins can delete users");
-      return;
-    }
+    if (!isAdmin) return;
 
-    const confirmDelete = confirm("Are you sure you want to delete this user?");
-    if (!confirmDelete) return;
+    if (!confirm("Are you sure you want to delete this user?")) return;
 
     try {
       const res = await fetch(`http://localhost:5000/api/users/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to delete user");
-      }
+      if (!res.ok) throw new Error("Failed to delete user");
 
       setUsers((prev) => prev.filter((u) => u._id !== id));
     } catch (err: any) {
@@ -103,8 +92,8 @@ export default function AdminUsersPage() {
     }
   };
 
-  /* ================= UI STATES ================= */
-  if (loading) return <p className="text-center py-20">Loading users...</p>;
+  /* ================= UI ================= */
+  if (loading) return <p className="text-center py-20">Loading...</p>;
   if (error) return <p className="text-center py-20 text-red-600">{error}</p>;
 
   return (
@@ -112,7 +101,7 @@ export default function AdminUsersPage() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-[#3f1a7b]">Manage Users</h1>
 
-        {loggedInUser?.role === "admin" && (
+        {isAdmin && (
           <Link
             href="/admin/users/add"
             className="flex items-center gap-2 bg-yellow-400 text-[#3f1a7b] px-4 py-2 rounded font-semibold hover:bg-[#3f1a7b] hover:text-white transition"
@@ -130,14 +119,14 @@ export default function AdminUsersPage() {
             <div key={user._id} className="bg-white rounded-xl shadow p-4">
               <h3 className="font-bold text-[#3f1a7b]">{user.name}</h3>
               <p className="text-sm text-gray-500">{user.email}</p>
-              <p className="text-sm mt-1">
-                Role: <span className="font-medium">{user.role}</span>
-              </p>
+              <p className="text-sm">Role: {user.role}</p>
               <p className="text-sm">
                 Status:{" "}
                 <span
                   className={`font-medium ${
-                    user.status === "Active" ? "text-green-600" : "text-red-600"
+                    user.status.toLowerCase() === "active"
+                      ? "text-green-600"
+                      : "text-red-600"
                   }`}
                 >
                   {user.status}
@@ -147,15 +136,15 @@ export default function AdminUsersPage() {
               <div className="flex gap-3 mt-4">
                 <Link
                   href={`/admin/users/edit/${user._id}`}
-                  className="flex items-center gap-1 text-sm px-3 py-1 border rounded hover:bg-gray-100"
+                  className="flex items-center gap-1 text-sm px-3 py-1 border rounded hover:bg-gray-100 transition"
                 >
                   <Pencil size={14} /> Edit
                 </Link>
 
-                {loggedInUser?.role === "admin" && (
+                {isAdmin && (
                   <button
                     onClick={() => handleDelete(user._id)}
-                    className="flex items-center gap-1 text-sm px-3 py-1 border border-red-400 text-red-600 rounded hover:bg-red-50"
+                    className="flex items-center gap-1 text-sm px-3 py-1 border border-red-400 text-red-600 rounded hover:bg-red-50 transition"
                   >
                     <Trash2 size={14} /> Delete
                   </button>

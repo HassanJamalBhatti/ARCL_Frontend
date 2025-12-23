@@ -22,23 +22,57 @@ export default function EditUserPage() {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("User");
+  const [role, setRole] = useState("user");
   const [status, setStatus] = useState("Active");
   const [password, setPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
+  const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
 
-  /* ================= FETCH USER ================= */
+  const token =
+    typeof window !== "undefined"
+      ? localStorage.getItem("adminToken")
+      : null;
+
+  const isAdmin = loggedInUser?.role.toLowerCase() === "admin";
+
+  /* ================= FETCH CURRENT USER ================= */
+  useEffect(() => {
+    const fetchMe = async () => {
+      if (!token) return setError("Not authenticated");
+
+      try {
+        const res = await fetch("http://localhost:5000/api/auth/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Not authenticated");
+
+        const data = await res.json();
+        setLoggedInUser(data);
+      } catch (err: any) {
+        setError(err.message);
+      }
+    };
+
+    fetchMe();
+  }, [token]);
+
+  /* ================= FETCH USER TO EDIT ================= */
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/users/${id}`);
+        const res = await fetch(`http://localhost:5000/api/users/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Failed to load user");
+
         const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error("Failed to load user");
-        }
-
         setName(data.name);
         setEmail(data.email);
         setRole(data.role);
@@ -50,8 +84,8 @@ export default function EditUserPage() {
       }
     };
 
-    fetchUser();
-  }, [id]);
+    if (token) fetchUser();
+  }, [id, token]);
 
   /* ================= UPDATE USER ================= */
   const handleSubmit = async (e: React.FormEvent) => {
@@ -60,26 +94,29 @@ export default function EditUserPage() {
     setError("");
 
     try {
-      const payload: any = { name, role, status };
+      const payload: any = { name };
 
-      // Only update password if provided
       if (password.trim()) {
         payload.password = password;
+      }
+
+      // Only admins can update role/status
+      if (isAdmin) {
+        payload.role = role;
+        payload.status = status;
       }
 
       const res = await fetch(`http://localhost:5000/api/users/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Failed to update user");
-      }
+      if (!res.ok) throw new Error(data.message || "Failed to update user");
 
       router.push("/admin/users");
     } catch (err: any) {
@@ -90,13 +127,8 @@ export default function EditUserPage() {
   };
 
   /* ================= UI STATES ================= */
-  if (loading) {
-    return <p className="text-center py-20">Loading user...</p>;
-  }
-
-  if (error) {
-    return <p className="text-center py-20 text-red-600">{error}</p>;
-  }
+  if (loading) return <p className="text-center py-20">Loading user...</p>;
+  if (error) return <p className="text-center py-20 text-red-600">{error}</p>;
 
   return (
     <div className="max-w-xl mx-auto px-6 py-12">
@@ -122,23 +154,27 @@ export default function EditUserPage() {
             disabled
           />
 
-          <select
-            className="border p-3 rounded w-full"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-          >
-            <option value="Admin">Admin</option>
-            <option value="User">User</option>
-          </select>
+          {isAdmin && (
+            <select
+              className="border p-3 rounded w-full"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <option value="admin">Admin</option>
+              <option value="user">User</option>
+            </select>
+          )}
 
-          <select
-            className="border p-3 rounded w-full"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-          </select>
+          {isAdmin && (
+            <select
+              className="border p-3 rounded w-full"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          )}
         </div>
 
         {/* Password (optional) */}

@@ -26,7 +26,7 @@ export default function AdminSidebar() {
   useEffect(() => {
     const token = localStorage.getItem("adminToken");
     if (!token) {
-      router.replace("/admin/login");
+      router.replace("/login");
     }
   }, [router]);
 
@@ -92,6 +92,14 @@ export default function AdminSidebar() {
           active={pathname.startsWith("/admin/services")}
         >
           Services
+        </NavItem>
+
+        <NavItem
+          href="/admin/news"
+          icon={<Megaphone size={18} />}
+          active={pathname.startsWith("/admin/news")}
+        >
+          News&Updates
         </NavItem>
 
         <NavItem
