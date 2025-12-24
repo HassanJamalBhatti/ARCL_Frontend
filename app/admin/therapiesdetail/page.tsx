@@ -25,11 +25,11 @@ export default function AdminTherapies() {
   const [therapies, setTherapies] = useState<Therapy[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
   const fetchTherapies = async () => {
     setLoading(true);
     setError(null);
-    const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+    
     try {
       const res = await fetch(`${API_URL}/api/therapies`);
       if (!res.ok) throw new Error("Failed to fetch therapies");
