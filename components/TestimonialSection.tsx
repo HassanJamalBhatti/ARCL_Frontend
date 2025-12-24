@@ -50,25 +50,27 @@ export default function TestimonialSection() {
     autoplaySpeed: 4000,
     responsive: [
       { breakpoint: 1024, settings: { slidesToShow: 2 } },
-      { breakpoint: 640, settings: { slidesToShow: 1 } },
+      { breakpoint: 768, settings: { slidesToShow: 1 } },
     ],
   };
 
   return (
-    <section className="py-16 bg-[#f4f1ff] text-center overflow-x-hidden">
+    <section className="py-16 bg-[#f4f1ff] text-center overflow-hidden">
+
+      {/* ================= HEADING ================= */}
       <p className="text-lg">Happiness Worldwide</p>
       <h2 className="text-4xl font-bold text-[#2a1a7b] mt-2">
         Autism Testimonials
       </h2>
 
-      <div className="mt-12 max-w-6xl mx-auto">
+      {/* ================= DESKTOP / TABLET SLIDER ================= */}
+      <div className="hidden md:block mt-12 max-w-6xl mx-auto">
         <Slider {...settings}>
           {testimonials.map((t, index) => (
             <div key={index} className="px-4">
               <div className="bg-white rounded-xl p-6 relative shadow-md h-[400px] flex flex-col">
-                
-                {/* Avatar */}
-                <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full bg-white border-4 border-white shadow-xl flex items-center justify-center overflow-hidden relative">
+
+                <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full bg-white border-4 border-white shadow-xl overflow-hidden">
                   {t.img ? (
                     <Image
                       src={t.img}
@@ -82,13 +84,12 @@ export default function TestimonialSection() {
                   )}
                 </div>
 
-                {/* Content */}
                 <div className="mt-12 flex-1 flex flex-col justify-between">
                   <div>
                     <h3 className="font-bold text-lg text-[#2a1a7b]">
                       {t.name}
                     </h3>
-                    <p className="text-gray-600 mt-2 text-sm">
+                    <p className="text-gray-600 mt-2 text-sm leading-relaxed">
                       {t.message}
                     </p>
                   </div>
@@ -102,6 +103,43 @@ export default function TestimonialSection() {
           ))}
         </Slider>
       </div>
+
+      {/* ================= MOBILE VIEW (NO SLIDER) ================= */}
+      <div className="md:hidden mt-12 max-w-xl mx-auto px-4 space-y-8">
+        {testimonials.map((t, index) => (
+          <div
+            key={index}
+            className="bg-white rounded-xl p-6 relative shadow-md"
+          >
+            <div className="w-20 h-20 mx-auto -mt-12 rounded-full bg-white border-4 border-white shadow-xl overflow-hidden relative">
+              {t.img ? (
+                <Image
+                  src={t.img}
+                  alt={t.name}
+                  fill
+                  className="object-cover"
+                  sizes="80px"
+                />
+              ) : (
+                <User className="w-10 h-10 text-gray-400 mx-auto mt-5" />
+              )}
+            </div>
+
+            <div className="mt-6">
+              <h3 className="font-bold text-lg text-[#2a1a7b]">
+                {t.name}
+              </h3>
+              <p className="text-gray-600 mt-3 text-sm leading-relaxed">
+                {t.message}
+              </p>
+              <p className="mt-4 font-semibold text-[#2a1a7b]">
+                {t.role}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
     </section>
   );
 }
