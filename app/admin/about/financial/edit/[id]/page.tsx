@@ -11,6 +11,7 @@ export default function EditFinancialReportPage() {
     title: "",
     pdfUrl: "",
   });
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
   const [newPdf, setNewPdf] = useState<File | null>(null);
   const [pdfPreview, setPdfPreview] = useState<string | null>(null);

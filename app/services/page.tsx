@@ -60,13 +60,15 @@ export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+    const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 
   // Fetch services from backend API
   useEffect(() => {
     const fetchServices = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost:5000/api/services");
+        const res = await fetch(`${API_URL}/api/services`);
         
         if (!res.ok) {
           throw new Error(`Failed to fetch services: ${res.status}`);

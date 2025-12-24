@@ -23,11 +23,13 @@ interface Therapy {
 export default function WhatWeOffer() {
   const [therapies, setTherapies] = useState<Therapy[]>([]);
   const icons = [<Brain />, <MessageSquare />, <BrainCog />, <Users />];
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 
   useEffect(() => {
     const fetchTherapies = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/therapies");
+        const res = await fetch(`${API_URL}/api/therapies`);
         const data = await res.json();
         // Filter only active therapies and take first 4
         const activeTherapies = data.filter((t: Therapy) => t.status === "Active").slice(0, 4);

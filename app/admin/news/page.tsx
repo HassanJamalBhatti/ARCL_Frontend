@@ -5,7 +5,8 @@ import Image from "next/image";
 import { Plus, Trash2, Edit } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const API_URL = "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 
 interface NewsUpdateItem {
   _id: string;

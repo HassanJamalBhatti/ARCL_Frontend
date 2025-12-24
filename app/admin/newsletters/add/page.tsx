@@ -15,6 +15,8 @@ export default function AddNewsletterPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +38,7 @@ export default function AddNewsletterPage() {
         formData.append("image", imageFile);
       }
 
-      const res = await fetch("http://localhost:5000/api/newsletters", {
+      const res = await fetch(`${API_URL}/api/newsletters`, {
         method: "POST",
         body: formData,
       });

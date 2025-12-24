@@ -12,6 +12,8 @@ export default function AddExecutiveMember() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 
   /* 🖼 Handle Image Change & Preview */
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,7 +49,7 @@ export default function AddExecutiveMember() {
       data.append("image", imageFile);
 
       // 🔴 Replace with your API endpoint
-      const res = await fetch("http://localhost:5000/api/executive", {
+      const res = await fetch(`${API_URL}/api/executive`, {
         method: "POST",
         body: data,
         });

@@ -20,6 +20,8 @@ export default function AddFinancialReportPage() {
     setPdfFile(file);
     setPdfPreview(URL.createObjectURL(file));
   };
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 
   /* Submit form */
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,7 +39,7 @@ export default function AddFinancialReportPage() {
       formData.append("title", title);
       formData.append("pdf", pdfFile);
 
-      const res = await fetch("http://localhost:5000/api/financial", {
+      const res = await fetch(`${API_URL}/api/financial`, {
         method: "POST",
         body: formData,
       });

@@ -11,6 +11,8 @@ export default function DonatePage() {
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +23,7 @@ export default function DonatePage() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/donations", {
+      const res = await fetch(`${API_URL}/api/donations`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ firstName, lastName, email, phone, message }),

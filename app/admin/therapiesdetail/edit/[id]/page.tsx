@@ -43,6 +43,7 @@ export default function EditTherapy() {
   const router = useRouter();
   const params = useParams();
   const { id } = params;
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<Therapy>({
@@ -58,7 +59,7 @@ export default function EditTherapy() {
     if (!id) return;
     setLoading(true);
 
-    fetch(`http://localhost:5000/api/therapies/${id}`)
+    fetch(`${API_URL}/api/therapies/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setForm({
@@ -134,7 +135,7 @@ export default function EditTherapy() {
 
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/therapies/${id}`, {
+      const res = await fetch(`${API_URL}/api/therapies/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

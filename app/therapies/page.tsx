@@ -27,6 +27,8 @@ interface Therapy {
 
 export default function TherapiesSection() {
   const [therapies, setTherapies] = useState<Therapy[]>([]);
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 
   const icons = [
     <FaHandHoldingHeart size={40} />,
@@ -40,7 +42,7 @@ export default function TherapiesSection() {
   useEffect(() => {
     const fetchTherapies = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/therapies");
+        const res = await fetch(`${API_URL}/api/therapies`);
         const data = await res.json();
         // Filter only active therapies
         const activeTherapies = data.filter((t: Therapy) => t.status === "Active");

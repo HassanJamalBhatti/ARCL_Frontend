@@ -18,6 +18,8 @@ export default function AddGoverningMember() {
     setImageFile(file);
     setPreview(URL.createObjectURL(file));
   };
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +32,7 @@ export default function AddGoverningMember() {
     formData.append("image", imageFile);
 
     try {
-      const res = await fetch("http://localhost:5000/api/governing/add", {
+      const res = await fetch(`${API_URL}/api/governing/add`, {
         method: "POST",
         body: formData,
       });

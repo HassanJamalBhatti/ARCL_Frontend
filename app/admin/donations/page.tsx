@@ -15,9 +15,11 @@ interface Donation {
 export default function AdminDonationsPage() {
   const [donations, setDonations] = useState<Donation[]>([]);
   const [selected, setSelected] = useState<Donation | null>(null);
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/donations")
+    fetch(`${API_URL}/api/donations`)
       .then((res) => res.json())
       .then((data) => setDonations(data.donations || []))
       .catch((err) => console.error(err));

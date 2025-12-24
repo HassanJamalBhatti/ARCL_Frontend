@@ -31,12 +31,14 @@ export default function EditNewsPage() {
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 
   // Fetch existing newsupdate data
   useEffect(() => {
     const fetchNewsUpdate = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/newsupdate/${id}`);
+        const res = await fetch(`${API_URL}/api/newsupdate/${id}`);
         const text = await res.text();
         let data;
         try {
@@ -92,7 +94,7 @@ export default function EditNewsPage() {
       if (form.image) formData.append("image", form.image);
 
       const res = await fetch(
-        `http://localhost:5000/api/newsupdate/${id}`,
+        `${API_URL}/api/newsupdate/${id}`,
         {
           method: "PUT",
           body: formData,
@@ -207,7 +209,7 @@ export default function EditNewsPage() {
                     preview
                       ? preview
                       : form.existingImage
-                      ? `http://localhost:5000${form.existingImage}`
+                      ? `${API_URL}${form.existingImage}`
                       : "/images/book.png"
                   }
                   alt={form.title}

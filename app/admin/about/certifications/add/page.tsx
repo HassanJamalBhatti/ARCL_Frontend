@@ -6,6 +6,7 @@ import Image from "next/image";
 
 export default function AddCertificationPage() {
   const router = useRouter();
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
   const [form, setForm] = useState({ title: "" });
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -54,7 +55,7 @@ export default function AddCertificationPage() {
 
     try {
       // 🔴 Replace with your backend API
-      const res = await fetch("http://localhost:5000/api/certifications", {
+      const res = await fetch(`${API_URL}/api/certifications`, {
         method: "POST",
         body: formData,
       });

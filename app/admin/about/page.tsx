@@ -25,8 +25,8 @@ interface FinancialPDF {
   title: string;
   pdf: string;
 }
+const API = process.env.NEXT_PUBLIC_API_URL!;
 
-const API = "http://localhost:5000";
 
 /* ================= PAGE ================= */
 export default function AdminPage() {

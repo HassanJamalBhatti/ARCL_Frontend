@@ -33,9 +33,10 @@ export default function AdminSidebar() {
   // Logout function
   const handleLogout = async () => {
     const sessionId = localStorage.getItem("sessionId");
+    const API_URL = process.env.NEXT_PUBLIC_API_URL!;
     try {
       if (sessionId) {
-        await fetch("http://localhost:5000/api/auth/logout", {
+        await fetch(`${API_URL}/api/auth/logout`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ sessionId }),

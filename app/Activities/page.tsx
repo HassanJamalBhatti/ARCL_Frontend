@@ -7,7 +7,7 @@ import GetInTouch from "@/components/GetInTouch";
 import Image from "next/image";
 import { X } from "lucide-react";
 
-const API_URL = "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 interface NewsItem {
   _id: string;

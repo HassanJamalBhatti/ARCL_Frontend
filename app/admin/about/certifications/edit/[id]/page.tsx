@@ -13,7 +13,7 @@ export default function EditCertificationPage() {
     image: "", // existing image URL
     pdf: "",   // existing pdf URL
   });
-
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
   const [newImage, setNewImage] = useState<File | null>(null);
   const [newPdf, setNewPdf] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -23,13 +23,13 @@ export default function EditCertificationPage() {
   /* ================= FETCH CERTIFICATION ================= */
   const fetchCertification = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/certifications/${id}`);
+      const res = await fetch(`${API_URL}/api/certifications/${id}`);
       if (!res.ok) throw new Error("Failed to fetch certification");
       const data = await res.json();
       setForm({
         title: data.title,
-        image: `http://localhost:5000${data.image}`,
-        pdf: `http://localhost:5000${data.pdf}`,
+        image: `${API_URL}${data.image}`,
+        pdf: `${API_URL}${data.pdf}`,
       });
     } catch (err) {
       console.error(err);
@@ -74,7 +74,7 @@ export default function EditCertificationPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`http://localhost:5000/api/certifications/${id}`, {
+      const res = await fetch(`${API_URL}/api/certifications/${id}`, {
         method: "PUT",
         body: fd,
       });

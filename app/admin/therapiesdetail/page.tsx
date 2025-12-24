@@ -29,8 +29,9 @@ export default function AdminTherapies() {
   const fetchTherapies = async () => {
     setLoading(true);
     setError(null);
+    const API_URL = process.env.NEXT_PUBLIC_API_URL!;
     try {
-      const res = await fetch("http://localhost:5000/api/therapies");
+      const res = await fetch(`${API_URL}/api/therapies`);
       if (!res.ok) throw new Error("Failed to fetch therapies");
       const data = await res.json();
       setTherapies(data);
@@ -49,7 +50,7 @@ export default function AdminTherapies() {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this therapy?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/therapies/${id}`, { method: "DELETE" });
+      const res = await fetch(`${API_URL}/api/therapies/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete therapy");
       setTherapies(therapies.filter((t) => t._id !== id));
       alert("Therapy deleted successfully");

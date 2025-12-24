@@ -33,11 +33,13 @@ export default function TherapyDetail() {
   const [therapy, setTherapy] = useState<Therapy | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+    const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 
   useEffect(() => {
     const fetchTherapy = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/therapies/${id}`);
+        const res = await fetch(`${API_URL}/api/therapies/${id}`);
         if (!res.ok) throw new Error(`Failed to fetch therapy: ${res.status}`);
         const data: Therapy = await res.json();
         if (!data || !data._id) setError("Therapy not found.");

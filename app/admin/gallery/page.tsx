@@ -28,6 +28,8 @@ export default function AdminGalleryPage() {
 
   const [filterTherapy, setFilterTherapy] = useState("");
   const [search, setSearch] = useState("");
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 
   const [form, setForm] = useState<{
     files: File[];
@@ -42,13 +44,13 @@ export default function AdminGalleryPage() {
   /* ================= FETCH ================= */
 
   const fetchTherapies = async () => {
-    const res = await fetch("http://localhost:5000/api/therapies");
+    const res = await fetch(`${API_URL}/api/therapies`);
     const data = await res.json();
     setTherapies(data.filter((t: Therapy) => t.status === "Active"));
   };
 
   const fetchGallery = async () => {
-    const res = await fetch("http://localhost:5000/api/gallery");
+    const res = await fetch(`${API_URL}/api/gallery`);
     const data = await res.json();
     setGallery(data);
   };
@@ -81,7 +83,7 @@ export default function AdminGalleryPage() {
     fd.append("therapyId", form.therapyId);
 
     setLoading(true);
-    await fetch("http://localhost:5000/api/gallery", {
+    await fetch(`${API_URL}/api/gallery`, {
       method: "POST",
       body: fd,
     });
@@ -95,7 +97,7 @@ export default function AdminGalleryPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete image?")) return;
-    await fetch(`http://localhost:5000/api/gallery/${id}`, {
+    await fetch(`${API_URL}/api/gallery/${id}`, {
       method: "DELETE",
     });
     fetchGallery();
@@ -277,7 +279,7 @@ export default function AdminGalleryPage() {
               >
                 <td className="p-4">
                   <Image
-                    src={`http://localhost:5000${g.imageUrl}`}
+                    src={`${API_URL}${g.imageUrl}`}
                     alt=""
                     width={80}
                     height={60}

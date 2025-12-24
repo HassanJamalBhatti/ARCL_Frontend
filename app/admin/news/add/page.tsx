@@ -25,7 +25,7 @@ export default function AddNewsPage() {
 
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
   // Cleanup preview URL when component unmounts or image changes
   useEffect(() => {
     return () => {
@@ -58,7 +58,7 @@ export default function AddNewsPage() {
     formData.append("date", form.date?.toString() || "");
     if (form.image) formData.append("image", form.image);
 
-    const res = await fetch("http://localhost:5000/api/newsupdate", {
+    const res = await fetch(`${API_URL}/api/newsupdate`, {
       method: "POST",
       body: formData,
     });

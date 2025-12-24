@@ -29,6 +29,8 @@ export default function EditUserPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
   const token =
     typeof window !== "undefined"
       ? localStorage.getItem("adminToken")
@@ -42,7 +44,7 @@ export default function EditUserPage() {
       if (!token) return setError("Not authenticated");
 
       try {
-        const res = await fetch("http://localhost:5000/api/auth/me", {
+        const res = await fetch(`${API_URL}/api/auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -64,7 +66,7 @@ export default function EditUserPage() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/users/${id}`, {
+        const res = await fetch(`${API_URL}/api/users/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -106,7 +108,7 @@ export default function EditUserPage() {
         payload.status = status;
       }
 
-      const res = await fetch(`http://localhost:5000/api/users/${id}`, {
+      const res = await fetch(`${API_URL}/api/users/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

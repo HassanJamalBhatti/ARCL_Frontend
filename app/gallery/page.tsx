@@ -25,11 +25,12 @@ export default function GalleryPage() {
   const [therapies, setTherapies] = useState<Therapy[]>([]);
   const [gallery, setGallery] = useState<GalleryImage[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>("All");
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
   /* ================= FETCH DATA ================= */
   const fetchTherapies = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/therapies");
+      const res = await fetch(`${API_URL}/api/therapies`);
       const data: Therapy[] = await res.json();
 
       // Filter only Active therapies
@@ -41,7 +42,7 @@ export default function GalleryPage() {
 
   const fetchGallery = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/gallery");
+      const res = await fetch(`${API_URL}/api/gallery`);
       const data: GalleryImage[] = await res.json();
       setGallery(data);
     } catch (err) {
@@ -134,7 +135,7 @@ export default function GalleryPage() {
                 className="group relative overflow-hidden rounded-2xl shadow-lg"
               >
                 <Image
-                  src={`http://localhost:5000${img.imageUrl}`}
+                  src={`${API_URL}${img.imageUrl}`}
                   alt={img.therapyTitle}
                   width={600}
                   height={400}

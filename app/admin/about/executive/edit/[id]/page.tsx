@@ -13,6 +13,8 @@ export default function EditExecutiveMember() {
     position: "",
     image: "", // existing image URL
   });
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 
   const [newImage, setNewImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -21,14 +23,14 @@ export default function EditExecutiveMember() {
   /* ================= FETCH MEMBER ================= */
   const fetchMember = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/executive/${id}`);
+      const res = await fetch(`${API_URL}/api/executive/${id}`);
       if (!res.ok) throw new Error("Failed to fetch member");
 
       const data = await res.json();
       setForm({
         name: data.name,
         position: data.position,
-        image: `http://localhost:5000${data.image}`,
+        image: `${API_URL}${data.image}`,
       });
     } catch (err) {
       console.error(err);
@@ -60,7 +62,7 @@ export default function EditExecutiveMember() {
 
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/executive/${id}`, {
+      const res = await fetch(`${API_URL}/api/executive/${id}`, {
         method: "PUT",
         body: fd,
       });

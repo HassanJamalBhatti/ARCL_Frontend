@@ -20,6 +20,7 @@ interface Service {
   role: "Admin" | "Services" | "Parent";
   url: string;
 }
+const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 export default function AddServicePage() {
   const router = useRouter();
@@ -93,7 +94,7 @@ export default function AddServicePage() {
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/services", {
+      const res = await fetch(`${API_URL}/api/services`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

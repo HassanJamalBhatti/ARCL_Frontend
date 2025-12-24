@@ -30,6 +30,7 @@ export default function AddTherapy() {
     role: "Admin",
     url: "",
   });
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
   const handleSectionChange = (index: number, field: keyof Section, value: any) => {
     const sections = [...form.sections];
@@ -73,7 +74,7 @@ export default function AddTherapy() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/therapies", {
+      const res = await fetch(`${API_URL}/api/therapies`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

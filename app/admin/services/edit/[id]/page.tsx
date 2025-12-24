@@ -32,12 +32,12 @@ export default function EditServicePage() {
     role: "Admin",
     url: "",
   });
-
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
   /* ================= FETCH SERVICE ================= */
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    fetch(`http://localhost:5000/api/services/${id}`)
+    fetch(`${API_URL}/api/services/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch service");
         return res.json();
@@ -116,7 +116,7 @@ export default function EditServicePage() {
 
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/services/${id}`, {
+      const res = await fetch(`${API_URL}/api/services/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
