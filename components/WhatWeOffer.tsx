@@ -72,11 +72,11 @@ export default function WhatWeOffer() {
                 <h3 className="text-2xl font-bold text-[#2a1d7a]">
                   {therapy.mainTitle}
                 </h3>
-                <p className="text-gray-600 mt-2 text-sm leading-relaxed max-w-sm">
+                {/* <p className="text-gray-600 mt-2 text-sm leading-relaxed max-w-sm">
                   {therapy.sections[0]?.description
                     ? therapy.sections[0].description.slice(0, 75) + "..."
                     : ""}
-                </p>
+                </p> */}
               </div>
 
               <div className="ml-auto skew-x-[8deg] text-[#2a1d7a] text-2xl opacity-70 group-hover:opacity-100 transition">
@@ -105,11 +105,11 @@ export default function WhatWeOffer() {
               <h3 className="text-lg font-bold text-[#2a1d7a]">
                 {therapy.mainTitle}
               </h3>
-              <p className="text-gray-600 text-sm mt-1 leading-relaxed">
+              {/* <p className="text-gray-600 text-sm mt-1 leading-relaxed">
                 {therapy.sections[0]?.description
                   ? therapy.sections[0].description.slice(0, 90) + "..."
                   : ""}
-              </p>
+              </p> */}
             </div>
           </div>
         ))}
